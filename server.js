@@ -16,7 +16,7 @@ app.get('/notes', (req, res) => {
     res.sendFile(__dirname + '/public/notes.html');
 });
 
-app.get("/api/notes", function (req, res) {
+app.get("/api/notes", (req, res) => {
     let obj = JSON.parse(fs.readFileSync('db/db.json', 'utf8'));
     return res.json(obj);
 });
@@ -26,54 +26,54 @@ app.post('/api/notes', (req, res) => {
     req.on('data', data => {
         body += data.toString();
     }).on('end', () => {
-        const newNote = parse(body);
+        const note = parse(body);
 
-        if (Object.keys(newNote).length !== 0) {
+        if (Object.keys(note).length !== 0) {
             fs.readFile(__dirname + '/db/db.json', 'utf-8', (err, data) => {
                 if (err) {
                     throw err;
                 }
 
                 data = JSON.parse(data);
-                newNote.id = data.length;
-                data.push(newNote);
+                note.id = data.length;
+                data.push(note);
 
                 fs.writeFile(__dirname + '/db/db.json', JSON.stringify(data), err => {
                     if (err) throw err;
-                    console.log('Success.')
+                    console.log('Success!')
                 });
             });
-            res.send(newNote);
+            res.send(note);
         } else {
-            throw new Error('Something went wrong.');
+            throw new Error('Error!');
         }
     });
 })
 
 app.delete('/api/notes/:id', (req, res) => {
     const id = req.params.id;
-    fs.readFile(__dirname + '/db/db.json', 'utf-8', (err, notes) => {
+    fs.readFile(__dirname + '/db/db.json', 'utf-8', (err, noteList) => {
         if (err) {
             throw err;
         }
 
-        notes = JSON.parse(notes);
-        for (let i = 0; i < notes.length; i++) {
-            if (notes[i].id === parseInt(id)) {
-                notes.splice(i, 1);
+        noteList = JSON.parse(noteList);
+        for (let i = 0; i < noteList.length; i++) {
+            if (noteList[i].id === parseInt(id)) {
+                noteList.splice(i, 1);
             }
         }
 
-        fs.writeFile(__dirname + '/db/db.json', JSON.stringify(notes), err => {
+        fs.writeFile(__dirname + '/db/db.json', JSON.stringify(noteList), err => {
             if (err) throw err;
 
-            console.log('Success.')
+            console.log('Success!')
         });
     });
 
-    res.send('Deleted.');
+    res.send('Deleted');
 })
-app.get("*", function (req, res) {
+app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "/public/index.html"));
 });
 app.listen(PORT, function () {
